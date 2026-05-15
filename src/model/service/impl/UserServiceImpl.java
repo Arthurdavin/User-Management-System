@@ -70,10 +70,6 @@ public class UserServiceImpl implements UserService {
             existingUser.setPassword(updateRequestDto.password());
         }
 
-//        existingUser.setProfile(updateRequestDto.profile());
-//        existingUser.setEmail(updateRequestDto.email());
-//        existingUser.setName(updateRequestDto.name());
-
         // call DAO to persist the change
 
         User updateUser = userDao.update(existingUser);

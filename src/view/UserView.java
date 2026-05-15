@@ -7,7 +7,6 @@ import model.dto.response.UserResponseDto;
 import util.APIResponseTemplate;
 import util.InputUtil;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public class UserView {
@@ -81,12 +80,7 @@ public class UserView {
                     new UpdateRequestDto(name, email, pass, profile)
             );
 
-            UserTableView.display(new APIResponseTemplate<>(
-                    response.status(),
-                    response.message(),
-                    response.timeStamp(),
-                    List.of(response.data())
-            ));
+            displaySingle(response);
 
         } catch (RuntimeException e) {
             System.out.println("Error: " + e.getMessage());
