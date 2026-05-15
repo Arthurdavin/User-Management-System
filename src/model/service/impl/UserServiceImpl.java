@@ -57,10 +57,22 @@ public class UserServiceImpl implements UserService {
 
         // map data from dto to Entity
 
-        existingUser.setProfile(updateRequestDto.profile());
-        existingUser.setEmail(updateRequestDto.email());
-        existingUser.setName(updateRequestDto.name());
-        existingUser.setProfile(updateRequestDto.profile());
+        if(updateRequestDto.name()!=null && !updateRequestDto.name().isBlank()){
+            existingUser.setName(updateRequestDto.name());
+        }
+        if (updateRequestDto.profile()!=null && !updateRequestDto.profile().isBlank()){
+            existingUser.setProfile(updateRequestDto.profile());
+        }
+        if (updateRequestDto.email()!=null&& !updateRequestDto.email().isBlank()){
+            existingUser.setEmail(updateRequestDto.email());
+        }
+        if (updateRequestDto.password()!=null&&!updateRequestDto.password().isBlank()){
+            existingUser.setPassword(updateRequestDto.password());
+        }
+
+//        existingUser.setProfile(updateRequestDto.profile());
+//        existingUser.setEmail(updateRequestDto.email());
+//        existingUser.setName(updateRequestDto.name());
 
         // call DAO to persist the change
 

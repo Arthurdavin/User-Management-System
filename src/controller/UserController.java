@@ -70,6 +70,7 @@ public APIResponseTemplate<List<UserResponseDto>> getAllUsers(){
         return APIResponseTemplate.<UserResponseDto>builder()
                 .status(200)
                 .message("User deleted successfully")
+                .timeStamp(LocalDate.now())
                 .data(userService.deleteUserByUuid(uuid))
                 .build();
 //        return userService.deleteUserByUuid(uuid);
