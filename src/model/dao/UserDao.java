@@ -19,7 +19,7 @@ public class UserDao {
                 .findFirst()
                 .orElseThrow(()-> new RuntimeException("User is not found"));
         // remove old version of User
-        UserDataBase.users.remove(user);
+//        UserDataBase.users.remove(user);
         //update
         user.setName(uu.getName());
         user.setEmail(uu.getEmail());

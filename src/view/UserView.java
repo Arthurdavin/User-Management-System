@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class UserView {
+
     private final UserController userController = new UserController();
 
     public void showMenu() {
@@ -27,7 +28,10 @@ public class UserView {
                 case 4 -> updateUser();
                 case 5 -> searchByName();
                 case 6 -> findByUuid();
-                case 0 -> System.exit(0);
+                case 0 -> {
+                    System.out.println("System exited...");
+                    System.exit(0);
+                }
                 default -> System.out.println("Invalid choice!");
             }
         }
@@ -38,36 +42,29 @@ public class UserView {
         String email = InputUtil.getString("Enter Email: ");
         String pass = InputUtil.getString("Enter Password: ");
 
-//        UserResponseDto responseDto = userController.createUser(new CreateUserDto(name, email, pass)).data();
-//        System.out.println("Create successfully!");
-//        UserTableView.display(List.of(responseDto));
         var response = userController.createUser(new CreateUserDto(name, email, pass));
-        UserTableView.display(new APIResponseTemplate<>(
-                response.status(),
-                response.message(),
-                response.timeStamp(),
-                List.of(response.data())
-        ));
+
+        displaySingle(response);
+
     }
 
     private void viewAll() {
-//        List<UserResponseDto> users = userController.getAllUsers().data();
-//        UserTableView.display(users);
-        // The display logic handles the "empty" case inside UserTableView
-        UserTableView.display(userController.getAllUsers());
+        var response = userController.getAllUsers();
+        UserTableView.display(response);
     }
 
     private void findByUuid() {
         String uuid = InputUtil.getString("Enter UUID: ");
-        UserResponseDto user = userController.getUserByUuid(uuid);
-        if (user != null) {
-            UserTableView.display(new APIResponseTemplate<>(
-                    200,
-                    "User find",
-                    LocalDate.now(),
-                    List.of(user)));
-        } else {
-            System.out.println("User not Found!");
+        try{
+            var response = userController.getUserByUuid(uuid);
+            if (response.data() != null){
+                displaySingle(response);
+            }
+            else {
+                System.out.println("User not found!");
+            }
+        }catch (RuntimeException e){
+            System.out.println("Error: "+ e.getMessage());
         }
     }
 
@@ -79,44 +76,50 @@ public class UserView {
         String profile = InputUtil.getString("New Profile URL: ");
 
         try {
-            UserResponseDto updated = userController.updateUserByUuid(uuid, new UpdateRequestDto(name, email, pass, profile));
-//            System.out.println("Updated successfully!");
+            var response = userController.updateUserByUuid(
+                    uuid,
+                    new UpdateRequestDto(name, email, pass, profile)
+            );
+
             UserTableView.display(new APIResponseTemplate<>(
-                    200,
-                    "update successfully",
-                    LocalDate.now(),
-                    List.of(updated)
+                    response.status(),
+                    response.message(),
+                    response.timeStamp(),
+                    List.of(response.data())
             ));
-//            UserTableView.display(List.of(updated));
+
         } catch (RuntimeException e) {
-            System.err.println("Error: " + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
         }
     }
 
     private void searchByName() {
         String name = InputUtil.getString("Search name: ");
-        List<UserResponseDto> results = userController.searchByName(name);
-        if(results.isEmpty()){
+        var response = userController.searchByName(name);
+        if(response.data().isEmpty()){
             System.out.println("No users found matching: "+ name);
         }
         else {
-//            UserTableView.display(results);
-            UserTableView.display(new APIResponseTemplate<>(
-                    200,
-                   "This is result",
-                   LocalDate.now(),
-                    results
-            ));
+            UserTableView.display(response);
         }
     }
     private void deleteUser(){
         String uuid = InputUtil.getString("Enter UUID to delete: ");
         try{
-            userController.deleteUserByUuid(uuid);
-            System.out.println("Delete Successful...");
-//            UserTableView.display(List.of(deleteUser));
+            var response = userController.deleteUserByUuid(uuid);
+            displaySingle(response);
         }catch (RuntimeException e){
             System.out.println("Error: "+ e.getMessage());
         }
     }
+
+    private void displaySingle(APIResponseTemplate<UserResponseDto> response) {
+        UserTableView.display(new APIResponseTemplate<>(
+                response.status(),
+                response.message(),
+                response.timeStamp(),
+                List.of(response.data())
+        ));
+    }
+
 }

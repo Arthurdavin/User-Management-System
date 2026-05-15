@@ -47,13 +47,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto updateUserByUuid(String uuid, UpdateRequestDto updateRequestDto) {
+
         // Find the exiting user
+
         User existingUser = userDao.findAll()
                 .stream().filter(u->u.getUuid().equals(uuid))
                 .findFirst()
                 .orElseThrow(()->new RuntimeException("User not Found with UUID: "+ uuid));
 
         // map data from dto to Entity
+
         existingUser.setProfile(updateRequestDto.profile());
         existingUser.setEmail(updateRequestDto.email());
         existingUser.setName(updateRequestDto.name());

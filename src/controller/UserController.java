@@ -39,17 +39,40 @@ public APIResponseTemplate<List<UserResponseDto>> getAllUsers(){
             .data(userService.getAllUsers())
             .build();
 }
-    public UserResponseDto getUserByUuid(String uuid){
-        return userService.getUserByUuid(uuid);
+    public APIResponseTemplate<UserResponseDto> getUserByUuid(String uuid){
+//        return userService.getUserByUuid(uuid);
+        return APIResponseTemplate.<UserResponseDto>builder()
+                .status(200)
+                .message("User by UUID found")
+                .timeStamp(LocalDate.now())
+                .data(userService.getUserByUuid(uuid))
+                .build();
     }
-    public UserResponseDto updateUserByUuid(String uuid, UpdateRequestDto updateRequestDto){
-        return userService.updateUserByUuid(uuid,updateRequestDto);
+    public APIResponseTemplate<UserResponseDto> updateUserByUuid(String uuid, UpdateRequestDto updateRequestDto){
+        return APIResponseTemplate.<UserResponseDto>builder()
+                .status(200)
+                .message("User updated successfully")
+                .timeStamp(LocalDate.now())
+                .data(userService.updateUserByUuid(uuid,updateRequestDto))
+                .build();
+        //        return userService.updateUserByUuid(uuid,updateRequestDto);
     }
-    public List<UserResponseDto> searchByName(String name){
-        return userService.searchUserByName(name);
+    public APIResponseTemplate<List<UserResponseDto>> searchByName(String name){
+        return APIResponseTemplate.<List<UserResponseDto>>builder()
+                .status(200)
+                .message("Search completed")
+                .timeStamp(LocalDate.now())
+                .data(userService.searchUserByName(name))
+                .build();
+//        return userService.searchUserByName(name);
     }
-    public UserResponseDto deleteUserByUuid(String uuid){
-        return userService.deleteUserByUuid(uuid);
+    public APIResponseTemplate<UserResponseDto> deleteUserByUuid(String uuid){
+        return APIResponseTemplate.<UserResponseDto>builder()
+                .status(200)
+                .message("User deleted successfully")
+                .data(userService.deleteUserByUuid(uuid))
+                .build();
+//        return userService.deleteUserByUuid(uuid);
     };
 
 }
