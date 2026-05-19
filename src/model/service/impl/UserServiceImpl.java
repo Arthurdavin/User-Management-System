@@ -38,62 +38,41 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto getUserByUuid(String uuid) {
-        return userDao
-                .findAll()
-                .stream()
-                .filter(u->u.getUuid().contains(uuid))
-                .findFirst()
-                .map(userMapper::fromUserToUserResponse)
-                .orElse(null)
-                ;
+        User user = userDao.searchByUuid(uuid);
+        if(user==null){
+            System.out.println("User Not Found");
+        }
+        return userMapper.fromUserToUserResponse(user);
     }
 
     @Override
     public UserResponseDto updateUserByUuid(String uuid, UpdateRequestDto updateRequestDto) {
 
-        // Find the exiting user
-
-        User existingUser = userDao.findAll()
-                .stream().filter(u->u.getUuid().equals(uuid))
-                .findFirst()
-                .orElseThrow(()->new RuntimeException("User not Found with UUID: "+ uuid));
-
-        // map data from dto to Entity
-
+        User exitingUser = userDao.searchByUuid(uuid);
+        if (exitingUser == null){
+            throw new RuntimeException("User not found: "+ uuid);
+        }
         if(updateRequestDto.name()!=null && !updateRequestDto.name().isBlank()){
-            existingUser.setName(updateRequestDto.name());
+            exitingUser.setName(updateRequestDto.name());
         }
         if (updateRequestDto.profile()!=null && !updateRequestDto.profile().isBlank()){
-            existingUser.setProfile(updateRequestDto.profile());
+            exitingUser.setProfile(updateRequestDto.profile());
         }
         if (updateRequestDto.email()!=null&& !updateRequestDto.email().isBlank()){
-            existingUser.setEmail(updateRequestDto.email());
+            exitingUser.setEmail(updateRequestDto.email());
         }
         if (updateRequestDto.password()!=null&&!updateRequestDto.password().isBlank()){
-            existingUser.setPassword(updateRequestDto.password());
+            exitingUser.setPassword(updateRequestDto.password());
         }
-
-        // call DAO to persist the change
-
-        User updateUser = userDao.update(existingUser);
+        User updateUser = userDao.update(exitingUser);
         return userMapper.fromUserToUserResponse(updateUser);
+
     }
 
     @Override
     public List<UserResponseDto> searchUserByName(String name) {
-        // Check empty input
-        if (name == null || name.isBlank()){
-            return List.of();
-        }
-        // trim() → removes spaces before/after
-        String searchName = name.trim().toLowerCase();
-
-        return userDao.findAll()
+        return userDao.searchByName(name)
                 .stream()
-                .filter(u-> u.getName()!=null &&
-                        u.getName().toLowerCase().contains(searchName))
-                // Convert to DTO
-                // .map(u -> userMapper.fromUserToUserResponse(u))
                 .map(userMapper::fromUserToUserResponse)
                 .toList();
     }

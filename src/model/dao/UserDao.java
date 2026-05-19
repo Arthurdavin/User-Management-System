@@ -146,4 +146,62 @@ public class UserDao {
         }
         return user;
     }
+
+    public List<User> searchByName(String name) {
+        List<User> users = new ArrayList<>();
+
+        String sql = """
+            SELECT * FROM users
+            WHERE user_name ILIKE ?
+            """;
+
+        try (Connection conn = DataConnectionConfigure.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, "%" + name + "%");
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                users.add(new User(
+                        rs.getInt("id"),
+                        rs.getString("uuid"),
+                        rs.getString("user_name"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("profile")
+                ));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return users;
+    }
+    public User searchByUuid(String uuid){
+        String sql = """
+                SELECT * FROM users
+                WHERE uuid LIKE ?
+                """;
+        try(Connection conn = DataConnectionConfigure.getConnection()){
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1,uuid);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()){
+                return new User(
+                        rs.getInt("id"),
+                        rs.getString("uuid"),
+                        rs.getString("user_name"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("profile")
+                );
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
