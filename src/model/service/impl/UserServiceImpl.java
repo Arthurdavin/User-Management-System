@@ -31,18 +31,21 @@ public class UserServiceImpl implements UserService {
     public List<UserResponseDto> getAllUsers() {
         return userDao.findAll()
                 .stream()
-                .map(userMapper::fromUserToUserResponse)// It transforms each User into UserResponseDto.
-                .toList();
+                .map(userMapper::fromUserToUserResponse)
+                .toList()
+                ;
     }
 
     @Override
     public UserResponseDto getUserByUuid(String uuid) {
-        return userDao.findAll()
+        return userDao
+                .findAll()
                 .stream()
-                .filter(u->u.getUuid().equals(uuid))
+                .filter(u->u.getUuid().contains(uuid))
                 .findFirst()
                 .map(userMapper::fromUserToUserResponse)
-                .orElse(null);
+                .orElse(null)
+                ;
     }
 
     @Override
@@ -78,32 +81,35 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponseDto> searchUserByName(String name) {
-
-        if(name == null || name.isBlank()){
+        // Check empty input
+        if (name == null || name.isBlank()){
             return List.of();
         }
-
-        String searchToken = name.trim().toLowerCase();
+        // trim() → removes spaces before/after
+        String searchName = name.trim().toLowerCase();
 
         return userDao.findAll()
                 .stream()
-                .filter(u->u.getName()!=null
-                        && u.getName().toLowerCase().contains(searchToken))
+                .filter(u-> u.getName()!=null &&
+                        u.getName().toLowerCase().contains(searchName))
+                // Convert to DTO
+                // .map(u -> userMapper.fromUserToUserResponse(u))
                 .map(userMapper::fromUserToUserResponse)
                 .toList();
     }
 
     @Override
     public UserResponseDto deleteUserByUuid(String uuid) {
-        // 1. Find the user first so we can return their info after deletion
+        // check user first
         User userToDelete = userDao.findAll()
-                .stream()
-                .filter(u->u.getUuid().equals(uuid))
+                .stream().filter(u->u.getUuid().equals(uuid))
                 .findFirst()
-                .orElseThrow(()->new RuntimeException("User Not Found with: "+ uuid));
-        // 2. Perform the deletion via DAO
+                .orElseThrow(()->new RuntimeException("User 404: "+ uuid));
+
+        // remove it
+
         userDao.remove(userToDelete);
-        // 3. Return the mapped DTO
+        // Return deleted user info Convert deleted User entity to DTO.
         return userMapper.fromUserToUserResponse(userToDelete);
     }
 
